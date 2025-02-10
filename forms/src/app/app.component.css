@@ -1,0 +1,21 @@
+nav{
+  margin: 0;
+  background: #000;
+  padding-left: 8%;
+  padding-right: 8%;
+}
+
+nav ul {
+  display: flex;
+  flex-direction: row;
+}
+
+li {
+  padding: 16px;
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+  color: white;
+}

@@ -1,0 +1,17 @@
+<h1>
+    <button style="background-color: none;" (click)="onClick()">
+        <i class="bi" [class.bi-star-fill]="meuFavorito" [class.bi-star]="!meuFavorito" i>
+        </i>
+    </button>
+</h1>
+
+<h1>
+    <button style="background-color: none;" (click)="onClick()">
+        <i [ngClass]="{
+            'bi': true,
+            'bi-star-fill':meuFavorito,
+            'bi-star': !meuFavorito
+        }">
+        </i>
+    </button>
+</h1>

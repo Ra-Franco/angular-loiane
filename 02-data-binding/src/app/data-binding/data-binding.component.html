@@ -1,0 +1,104 @@
+<!-- <section class="property-binding">
+    <article>
+        <h3>Interpolation</h3>
+        <p>STring renederizada com interpolação: <a href="{{ url }}">teste Link</a></p>
+        <p>Resultado de 1 + 1 é : {{ 1 + 1 }}</p>
+        <p>Resultado de 1 + 1 não é {{ 1 + 1 + getValor()}}</p>
+        <p>Este curso é de angular {{ cursoAngular && getCurtirCurso() }}</p>
+    </article>
+
+    <article>
+        <h3>Property Binding</h3>
+        <img src="{{ urlImagem }}" />
+        <img [src]="urlImagem" />
+        <img bind-src="urlImagem">
+    </article>
+
+    <article>
+        <h3>Class e Style Binding</h3>
+        <div>
+            Selecione uma classe:
+            <select #classe (change)="0">
+                <option value="alert-success">Sucesso</option>
+                <option value="alert-info">Info</option>
+                <option value="alert-warning">Alerta</option>
+                <option value="alert-danger">Erro</option>
+            </select>
+            <br><br>
+
+            <div class="alert {{ classe.value }}">
+                Texto colorido conforme valor do combobox.
+            </div>
+
+            <div class="alert" role="alert" [class.alert-success]="classe.value == 'alert-success'">Sucesso</div>
+            <div class="alert" role="alert" [class.alert-info]="classe.value == 'alert-info'">Info</div>
+            <div class=" alert" role="alert" [class.alert-warning]="classe.value == 'alert-warning'">Alerta</div>
+            <div class="alert" role="alert" [class.alert-danger]="classe.value == 'alert-danger'">Erro</div>
+
+            <div class="alert alert-danger" role="alert"
+                [style.display]="classe.value === 'alert-danger' ? 'block' : 'none'">
+                Erro Style Binding</div>
+        </div>
+    </article>
+</section>
+
+<section>
+
+    <h3>Event Binding</h3>
+    <div>
+        <button (click)="botaoClicado()" class="btn btn-primary">
+            Me clique
+        </button>
+
+        <br><br>
+
+        <input type="text" name="teste" id="" (keyup)="onKeyUp($event)" (keyup.enter)="salvarValor(campoInput)"
+            (blur)="salvarValor(campoInput)" #campoInput />
+        <p>Valor atual: {{ valorAtual }}</p>
+        <p>Valor Salvo: {{ valorSalvo }}</p>
+
+
+        <br><br><br>
+
+        <span (mouseover)="onMouseOverOut()" (mouseout)="onMouseOverOut()" [class.highlight]="isMouseOver">
+            Passe o mouse sobre mim
+        </span>
+
+    </div>
+</section>
+
+
+<section class="two-way-biding">
+    <article>
+        <h3>Tho-way data binding</h3>
+
+        <div>
+            <input type="text" [value]="nome" #input (input)="nome = input.value" />
+
+           <input type="text" ngModel="nome" ngModelChange="nome = $event" /> 
+
+<input type="text" [(ngModel)]="nome" />
+
+<p>você digitou {{nome}}</p>
+</div>
+<br><br>
+
+<div>
+    <input type="text" [(ngModel)]="pessoa.nome">
+    <input type="text" [(ngModel)]="pessoa.idade">
+    <p>Nome da pessoa é {{ pessoa.nome }}</p>
+    <p>Idade da pessoa é {{ pessoa.idade }}</p>
+</div>
+</article> 
+</section>-->
+
+<section>
+    <h3>Input property component</h3>
+
+    <app-curso [nome]="nomeDoCurso"></app-curso>
+
+    <contador [valor]="valorInicial" (mudouValor)="onMudouValor($event)"></contador>
+
+    <p>valor inicial {{ valorInicial }}</p>
+
+</section>

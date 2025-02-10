@@ -1,0 +1,23 @@
+<nav style="background-color: black;">
+    <div style=" display: flex; gap: 20px;">
+        <a style="color: white;" [class.active]="aba === 'home'">
+            <button (click)="alteraAba('home')">Home</button>
+        </a>
+        <a style="color: white;" [class.active]="aba === 'features'">
+            <button (click)="alteraAba('features')">features</button>
+        </a>
+        <a style="color: white;" [class.active]="aba === 'pricing'">
+            <button (click)="alteraAba('pricing')">pricing</button>
+        </a>
+        <a style="color: white;" [class.active]="aba === 'about'">
+            <button (click)="alteraAba('about')">about</button>
+        </a>
+    </div>
+</nav>
+
+<div [ngSwitch]="aba">
+    <p *ngSwitchCase="'features'">Você está na features</p>
+    <p *ngSwitchCase="'pricing'">Você está na pricing</p>
+    <p *ngSwitchCase="'about'">Você está na about</p>
+    <p *ngSwitchDefault>Você está na home</p>
+</div>
