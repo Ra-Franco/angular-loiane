@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { ConsultaCepService } from '../shared/services/consulta-cep.service';
 
 @Component({
   selector: 'app-template-form',
@@ -14,7 +15,7 @@ export class TemplateFormComponent {
     email: null
   }
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private cepService: ConsultaCepService) {
 
   }
 
@@ -38,17 +39,13 @@ export class TemplateFormComponent {
     }
   }
 
-  consultaCEP(cep: any | null, form: any) {
-    cep = cep.value.replace(/\D/g, '');
-    if (cep != "") {
-      let validaCep = /^[0-9]{8}$/;
-      if (validaCep.test(cep)) {
-        this.resetaDadosFormulario(form);
-        this.http.get(`//viacep.com.br/ws/${cep}/json`)
-          .subscribe(
-            data => this.populaDadosForm(data, form)
-          )
-      }
+  consultaCEP(cep: any, form: any) {
+    cep = cep.value;
+    if (cep !== "") {
+      this.cepService.consultaCEP(cep)
+        .subscribe(
+          data => this.populaDadosForm(data, form)
+        )
     }
   }
 

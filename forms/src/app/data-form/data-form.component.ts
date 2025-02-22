@@ -2,7 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DropdownService } from '../shared/services/dropdown.service';
+import { ConsultaCepService } from '../shared/services/consulta-cep.service';
+import { Observable } from 'rxjs';
 import { EstadoBr } from '../shared/models/EstadoBr';
+import { Cargo } from '../shared/models/Cargo';
+import { Tecnologia } from '../shared/models/Tecnologia';
+import { Newsletter } from '../shared/models/Cargo copy';
 
 @Component({
   selector: 'app-data-form',
@@ -11,11 +16,18 @@ import { EstadoBr } from '../shared/models/EstadoBr';
 })
 export class DataFormComponent implements OnInit {
 
-  formulario: any = '';
-  estados: any = '';
+  formulario!: FormGroup;
+  estados!: Observable<EstadoBr[]>;
+  cargos!: Observable<Cargo[]>;
+  tecnologias!: Observable<Tecnologia[]>;
+  newsletterOp !: Observable<Newsletter[]>;
 
-
-  constructor(private formBuilder: FormBuilder, private http: HttpClient, private dropDownService: DropdownService) {
+  constructor(
+    private formBuilder: FormBuilder,
+    private http: HttpClient,
+    private cepService: ConsultaCepService,
+    private dropDownService: DropdownService
+  ) {
 
   }
 
@@ -24,10 +36,8 @@ export class DataFormComponent implements OnInit {
     //   nome: new FormControl(),
     //   email: new FormControl(),
     // });
-    this.dropDownService.getEstadosBr()
-      .subscribe((dados: any) => { this.estados = dados; console.log(dados) })
-
-
+    // this.dropDownService.getEstadosBr()
+    //   .subscribe((dados: any) => { this.estados = dados; console.log(dados) })
     this.formulario = this.formBuilder.group({
       nome: [null, [Validators.required, Validators.min(3), Validators.max(20)]],
       email: [null, [Validators.required, Validators.email]],
@@ -38,10 +48,17 @@ export class DataFormComponent implements OnInit {
         rua: [null, Validators.required],
         bairro: [null, Validators.required],
         cidade: [null, Validators.required],
-        estado: [null, Validators.required]
-      })
+        estado: [null, Validators.required],
+      }),
+      cargo: [null, Validators.required],
+      tecnologias: [null, Validators.required],
+      newsletter: ['S', Validators.required],
     })
 
+    this.estados = this.dropDownService.getEstadosBr();
+    this.cargos = this.dropDownService.getCargos();
+    this.tecnologias = this.dropDownService.getTecnologias();
+    this.newsletterOp = this.dropDownService.getNewsletter();
   }
 
   onSubmit() {
@@ -74,18 +91,22 @@ export class DataFormComponent implements OnInit {
   }
 
 
-  IsValidTouched(attribute: String) {
-    return !this.formulario.get(attribute).valid && (this.formulario.get(attribute).touched || this.formulario.get(attribute).dirty)
+  IsValidTouched(attribute: string): boolean {
+    const control = this.formulario.get(attribute);
+    if (!control) {
+      return false;
+    }
+    return !control.valid && (control.touched || control.dirty);
   }
 
   verificaEmailInvalido() {
     let campoEmail = this.formulario.get('email');
-    if (campoEmail.errors) {
+    if (campoEmail?.errors) {
       return campoEmail.errors['email'] && campoEmail.touched;
     }
   }
 
-  applyErrorCss(attribute: String) {
+  applyErrorCss(attribute: string) {
     return {
       'has-error': this.IsValidTouched(attribute),
       'has-feedback': this.IsValidTouched(attribute)
@@ -93,17 +114,13 @@ export class DataFormComponent implements OnInit {
   }
 
   consultaCEP() {
-    console.log(this.formulario.get('endereco.cep'))
-    let cep = this.formulario.get('endereco.cep').value.replace(/\D/g, '');
-    if (cep != "") {
-      let validaCep = /^[0-9]{8}$/;
-      if (validaCep.test(cep)) {
-        this.resetaDadosFormulario();
-        this.http.get(`//viacep.com.br/ws/${cep}/json`)
-          .subscribe(
-            data => this.populaDadosForm(data)
-          )
-      }
+    let cep = this.formulario.get('endereco.cep')?.value;
+    if (cep != null && cep !== '') {
+      this.resetaDadosFormulario();
+      this.cepService.consultaCEP(cep)
+        ?.subscribe(
+          data => this.populaDadosForm(data)
+        );
     }
   }
 
@@ -115,7 +132,7 @@ export class DataFormComponent implements OnInit {
         complemento: dados.complemento,
         bairro: dados.bairro,
         cidade: dados.localidade,
-        estado: dados.estado
+        estado: dados.uf
       }
     })
   }
@@ -124,14 +141,25 @@ export class DataFormComponent implements OnInit {
     this.formulario.patchValue({
       endereco: {
         cep: null,
-        numero: null,
-        complemento: null,
         rua: null,
         bairro: null,
         cidade: null,
         estado: null,
       }
     })
+  }
+
+  setarCargo() {
+    const cargo = { nome: 'Dev', nivel: 'Pleno', desc: 'Dev Pl' };
+    this.formulario.get('cargo')?.setValue(cargo);
+  }
+
+  compararCargos(obj1: Cargo, obj2: Cargo) {
+    return obj1 && obj2 ? (obj1.nome === obj2.nome && obj1.nivel === obj2.nivel) : obj1 === obj2;
+  }
+
+  setarTecnologias() {
+    this.formulario.get('tecnologias')?.setValue(['Java', 'PHP'])
   }
 
 }

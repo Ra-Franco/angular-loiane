@@ -65,7 +65,9 @@
             </div>
             <div class="col-md-3">
                 <label for="estado" class="control-label">Estado</label>
-                <input type="text" id="estado" class="form-control" formControlName="estado">
+                <select id="estado" class="form-control" formControlName="estado">
+                    <option *ngFor="let estado of estados | async" [value]="estado.sigla">{{estado.nome}}</option>
+                </select>
                 <app-campo-contro-erro [mostrarErro]=" IsValidTouched('endereco.estado')"
                     msgErro="O Estado é obrigatório!"></app-campo-contro-erro>
             </div>
@@ -73,8 +75,44 @@
 
     </div>
 
+    <div class="form-group">
+        <div class="col-md-3">
+            <label for="cargo" class="control-label">Cargo</label>
+            <select id="cargo" class="form-control" formControlName="cargo" [compareWith]="compararCargos">
+                <option *ngFor="let cargo of cargos | async" [ngValue]="cargo">{{cargo.desc}}</option>
+            </select>
+            <app-campo-contro-erro [mostrarErro]="IsValidTouched('cargo')"
+                msgErro="O cargo é obrigatório!"></app-campo-contro-erro>
+        </div>
+        <div class="col-md-3">
+            <label for="tecnologias" class="control-label">tecnologias</label>
+            <select multiple id="tecnologias" class="form-control" formControlName="tecnologias">
+                <option *ngFor="let tecnologia of tecnologias | async" [value]="tecnologia.nome">
+                    {{tecnologia.desc}}
+                </option>
+            </select>
+            <app-campo-contro-erro [mostrarErro]="IsValidTouched('tecnologias')"
+                msgErro="O tecnologias é obrigatório!"></app-campo-contro-erro>
+        </div>
+
+        <div class="col-md-3">
+            <label for="newsletter" class="control-label">Newsletter</label>
+            <div id="newsletter" class="row">
+                <div class="col-sm-4" *ngFor="let item of newsletterOp | async">
+                    <label class="radio-inline">
+                        <input type="radio" [value]="item.valor" formControlName="newsletter"> {{item.desc}}
+                    </label>
+                </div>
+            </div>
+            <app-campo-contro-erro [mostrarErro]="IsValidTouched('newsletter')"
+                msgErro="O newsletter é obrigatório!"></app-campo-contro-erro>
+        </div>
+    </div>
+
     <button type="submit" class="btn btn-primary">Submit</button>
     <button class="btn" (click)="resetar()">Cancelar</button>
+    <button class="btn" (click)="setarCargo()">Setar Cargo</button>
+    <button class="btn" (click)="setarTecnologias()">Setar Tecnologias</button>
 
     <p>Detalhes do Form</p>
     <app-form-debug [form]="formulario"></app-form-debug>
