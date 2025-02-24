@@ -5,7 +5,7 @@ import { EstadoBr } from '../models/EstadoBr';
 import { Observable, of } from 'rxjs';
 import { Cargo } from '../models/Cargo';
 import { Tecnologia } from '../models/Tecnologia';
-import { Newsletter } from '../models/Cargo copy';
+import { Newsletter } from '../models/Newsletter';
 
 
 @Injectable({

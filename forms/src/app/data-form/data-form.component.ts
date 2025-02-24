@@ -1,13 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DropdownService } from '../shared/services/dropdown.service';
 import { ConsultaCepService } from '../shared/services/consulta-cep.service';
 import { Observable } from 'rxjs';
 import { EstadoBr } from '../shared/models/EstadoBr';
 import { Cargo } from '../shared/models/Cargo';
 import { Tecnologia } from '../shared/models/Tecnologia';
-import { Newsletter } from '../shared/models/Cargo copy';
+import { Newsletter } from '../shared/models/Newsletter';
 
 @Component({
   selector: 'app-data-form',
@@ -21,6 +21,8 @@ export class DataFormComponent implements OnInit {
   cargos!: Observable<Cargo[]>;
   tecnologias!: Observable<Tecnologia[]>;
   newsletterOp !: Observable<Newsletter[]>;
+
+  frameworks = ['Angular', 'React', 'Vue', 'Sencha'];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -53,6 +55,8 @@ export class DataFormComponent implements OnInit {
       cargo: [null, Validators.required],
       tecnologias: [null, Validators.required],
       newsletter: ['S', Validators.required],
+      termos: [null, Validators.pattern('true')],
+      frameworks: this.buildFrameworks()
     })
 
     this.estados = this.dropDownService.getEstadosBr();
@@ -61,9 +65,28 @@ export class DataFormComponent implements OnInit {
     this.newsletterOp = this.dropDownService.getNewsletter();
   }
 
+
+  buildFrameworks() {
+    const values = this.frameworks.map(v => new FormControl(false));
+    return this.formBuilder.array(values);
+  }
+
+  frameworksFormControl() {
+    return (this.formulario.get('frameworks') as FormArray).controls
+  }
+
   onSubmit() {
+    console.log(this.formulario);
+
+    let valueSubmit = Object.assign({}, this.formulario.value);
+    valueSubmit = Object.assign(valueSubmit, {
+      frameworks: valueSubmit.frameworks
+        .map((v: string, i: number) => v ? this.frameworks[i] : null)
+        .filter((v: string) => v !== null)
+    });
+    console.log(valueSubmit.frameworks)
     if (this.formulario.valid) {
-      this.http.post('https://httpbin.org/post', JSON.stringify(this.formulario.value))
+      this.http.post('https://httpbin.org/post', JSON.stringify(valueSubmit))
         .pipe(res => res)
         .subscribe(dados => {
           console.log(dados);
