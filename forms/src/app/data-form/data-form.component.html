@@ -21,6 +21,17 @@
                 msgErro="Email inválido"></app-campo-contro-erro>
         </div>
     </div>
+    <div class="form-group" [ngClass]="applyErrorCss('confirmarEmail')">
+        <div class="col-sm-12">
+            <label for="confirmarEmail">Confirmar Email</label>
+        </div>
+        <div class="col-sm-12">
+            <input type="email" class="form-control" id="confirmarEmail" placeholder="nome@email.com"
+                formControlName="confirmarEmail">
+            <app-campo-contro-erro [mostrarErro]="formulario.get('confirmarEmail')?.hasError('equalsTo')"
+                msgErro="Os emails não são iguais!"></app-campo-contro-erro>
+        </div>
+    </div>
 
     <div formGroupName="endereco">
 
@@ -30,6 +41,8 @@
                 <input (blur)="consultaCEP()" type="text" id="cep" class="form-control" formControlName="cep">
                 <app-campo-contro-erro [mostrarErro]="IsValidTouched('endereco.cep')"
                     msgErro="O CEP é obrigatório!"></app-campo-contro-erro>
+                <app-campo-contro-erro [mostrarErro]="formulario.get('endereco.cep')?.hasError('cepInvalido')"
+                    msgErro="O CEP é inválido!"></app-campo-contro-erro>
             </div>
             <div class="col-md-3">
                 <label for="numero" class="control-label">Número</label>
@@ -129,6 +142,8 @@
                         <input type="checkbox" [formControlName]="i"> {{frameworks[i]}}
                     </label>
                 </div>
+                <app-campo-contro-erro [mostrarErro]="IsValidTouched('frameworks')"
+                    msgErro="Selecione pelo menos uma opção"></app-campo-contro-erro>
             </div>
         </div>
 
@@ -143,5 +158,5 @@
         </div>
     </div>
 
-    <app-form-debug [form]="formulario"></app-form-debug>
 </form>
+<app-form-debug [form]="formulario"></app-form-debug>

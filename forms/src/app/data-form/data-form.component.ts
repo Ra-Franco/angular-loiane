@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { DropdownService } from '../shared/services/dropdown.service';
 import { ConsultaCepService } from '../shared/services/consulta-cep.service';
 import { Observable } from 'rxjs';
@@ -8,11 +8,12 @@ import { EstadoBr } from '../shared/models/EstadoBr';
 import { Cargo } from '../shared/models/Cargo';
 import { Tecnologia } from '../shared/models/Tecnologia';
 import { Newsletter } from '../shared/models/Newsletter';
+import { FormValidations } from '../shared/form-validation';
 
 @Component({
   selector: 'app-data-form',
   templateUrl: './data-form.component.html',
-  styleUrl: './data-form.component.css'
+  styleUrls: ['./data-form.component.css']
 })
 export class DataFormComponent implements OnInit {
 
@@ -41,10 +42,11 @@ export class DataFormComponent implements OnInit {
     // this.dropDownService.getEstadosBr()
     //   .subscribe((dados: any) => { this.estados = dados; console.log(dados) })
     this.formulario = this.formBuilder.group({
-      nome: [null, [Validators.required, Validators.min(3), Validators.max(20)]],
+      nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
       email: [null, [Validators.required, Validators.email]],
+      confirmarEmail: [null, [FormValidations.equalsTo('email')]],
       endereco: this.formBuilder.group({
-        cep: [null, Validators.required],
+        cep: [null, [Validators.required, FormValidations.cepValidator]],
         numero: [null, Validators.required],
         complemento: [null],
         rua: [null, Validators.required],
@@ -53,7 +55,7 @@ export class DataFormComponent implements OnInit {
         estado: [null, Validators.required],
       }),
       cargo: [null, Validators.required],
-      tecnologias: [null, Validators.required],
+      tecnologias: [[], Validators.required],
       newsletter: ['S', Validators.required],
       termos: [null, Validators.pattern('true')],
       frameworks: this.buildFrameworks()
@@ -66,9 +68,12 @@ export class DataFormComponent implements OnInit {
   }
 
 
+
   buildFrameworks() {
-    const values = this.frameworks.map(v => new FormControl(false));
-    return this.formBuilder.array(values);
+    return this.formBuilder.array(
+      this.frameworks.map(() => new FormControl(false)),
+      FormValidations.requiredMinCheckbox(1)
+    );
   }
 
   frameworksFormControl() {
@@ -100,11 +105,11 @@ export class DataFormComponent implements OnInit {
   }
 
   verificaValidacoesForm(formGroup: FormGroup) {
-    Object.keys(formGroup.controls).forEach((campo) => {
-      const controle = formGroup.get(campo);
+    Object.keys(formGroup?.controls).forEach((campo) => {
+      const controle = formGroup?.get(campo);
       controle?.markAsDirty();
-      if (controle instanceof FormGroup) {
-        this.verificaValidacoesForm(controle);
+      if (controle instanceof FormGroup || controle instanceof FormArray) {
+        this.verificaValidacoesForm(controle as FormGroup);
       }
     })
   }
@@ -115,15 +120,15 @@ export class DataFormComponent implements OnInit {
 
 
   IsValidTouched(attribute: string): boolean {
-    const control = this.formulario.get(attribute);
+    const control = this.formulario?.get(attribute);
     if (!control) {
       return false;
     }
-    return !control.valid && (control.touched || control.dirty);
+    return control.hasError('required') && (control.touched || control.dirty);
   }
 
   verificaEmailInvalido() {
-    let campoEmail = this.formulario.get('email');
+    let campoEmail = this.formulario?.get('email');
     if (campoEmail?.errors) {
       return campoEmail.errors['email'] && campoEmail.touched;
     }
@@ -137,7 +142,7 @@ export class DataFormComponent implements OnInit {
   }
 
   consultaCEP() {
-    let cep = this.formulario.get('endereco.cep')?.value;
+    let cep = this.formulario?.get('endereco.cep')?.value;
     if (cep != null && cep !== '') {
       this.resetaDadosFormulario();
       this.cepService.consultaCEP(cep)
@@ -174,7 +179,7 @@ export class DataFormComponent implements OnInit {
 
   setarCargo() {
     const cargo = { nome: 'Dev', nivel: 'Pleno', desc: 'Dev Pl' };
-    this.formulario.get('cargo')?.setValue(cargo);
+    this.formulario?.get('cargo')?.setValue(cargo);
   }
 
   compararCargos(obj1: Cargo, obj2: Cargo) {
@@ -182,7 +187,7 @@ export class DataFormComponent implements OnInit {
   }
 
   setarTecnologias() {
-    this.formulario.get('tecnologias')?.setValue(['Java', 'PHP'])
+    this.formulario?.get('tecnologias')?.setValue(['Java', 'PHP'])
   }
 
 }

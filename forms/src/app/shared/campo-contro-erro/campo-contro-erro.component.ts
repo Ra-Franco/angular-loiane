@@ -7,7 +7,7 @@ import { Component, Input } from '@angular/core';
 })
 export class CampoControErroComponent {
 
-  @Input() mostrarErro: boolean = false;
+  @Input() mostrarErro: boolean | undefined = false;
   @Input() msgErro: String = "";
 
 }

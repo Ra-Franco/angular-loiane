@@ -1,14 +1,14 @@
-<div style="margin-top: 20px;" *ngIf="form">
+<div style="margin-top: 10%; padding-top: 10%; " *ngIf=" form">
     <div>
         Detalhes do form
+        <pre>
+            Form Válido: {{form.valid}}
+        </pre>
+        <pre>
+            Form submetido: {{form.submitted}}
+        </pre>
+        <pre>
+            Valores: <br> {{form.value | json}}
+        </pre>
     </div>
-    <pre>
-        Form Válido: {{form.valid}}
-    </pre>
-    <pre>
-        Form submetido: {{form.submitted}}
-    </pre>
-    <pre>
-        Valores: <br> {{form.value | json}}
-    </pre>
 </div>
