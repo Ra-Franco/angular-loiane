@@ -5,8 +5,7 @@
         </div>
         <div class="col-sm-12">
             <input type="text" class="form-control" id="nome" placeholder="Nome" formControlName="nome" required>
-            <app-campo-contro-erro [mostrarErro]="IsValidTouched('nome')"
-                msgErro="O nome é obrigatório!"></app-campo-contro-erro>
+            <app-error-msg [control]="formulario.get('nome')" label="nome"></app-error-msg>
         </div>
     </div>
     <div class="form-group" [ngClass]="applyErrorCss('email')">
@@ -18,7 +17,13 @@
             <app-campo-contro-erro [mostrarErro]="IsValidTouched('email')"
                 msgErro="O email é obrigatório!"></app-campo-contro-erro>
             <app-campo-contro-erro [mostrarErro]="verificaEmailInvalido()"
-                msgErro="Email inválido"></app-campo-contro-erro>
+                msgErro="Email inválido!"></app-campo-contro-erro>
+            <app-campo-contro-erro [mostrarErro]="formulario.get('email')?.status === 'PENDING'"
+                msgErro="Validando email..."></app-campo-contro-erro>
+            <app-campo-contro-erro [mostrarErro]="formulario.get('email')?.status === 'VALID'"
+                msgErro="Email Válido!"></app-campo-contro-erro>
+            <app-campo-contro-erro [mostrarErro]="formulario.get('email')?.hasError('emailInvalido')"
+                msgErro="Email já cadastrado!"></app-campo-contro-erro>
         </div>
     </div>
     <div class="form-group" [ngClass]="applyErrorCss('confirmarEmail')">
