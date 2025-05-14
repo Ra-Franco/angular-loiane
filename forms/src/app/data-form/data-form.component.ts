@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { DropdownService } from '../shared/services/dropdown.service';
 import { ConsultaCepService } from '../shared/services/consulta-cep.service';
-import { map, Observable } from 'rxjs';
+import { distinctUntilChanged, empty, map, Observable, switchMap, tap } from 'rxjs';
 import { EstadoBr } from '../shared/models/EstadoBr';
 import { Cargo } from '../shared/models/Cargo';
 import { Tecnologia } from '../shared/models/Tecnologia';
@@ -37,6 +37,7 @@ export class DataFormComponent implements OnInit {
   }
 
   ngOnInit() {
+
     // this.formulario = new FormGroup({
     //   nome: new FormControl(),
     //   email: new FormControl(),
@@ -65,6 +66,15 @@ export class DataFormComponent implements OnInit {
       frameworks: this.buildFrameworks()
     })
 
+    this.formulario.get('endereco.cep')?.statusChanges
+      .pipe(
+        distinctUntilChanged(),
+        tap(value => console.log(value)),
+        switchMap(status => status === 'VALID' ? this.cepService.consultaCEP(this.formulario.get('endereco.cep')?.value)
+          : empty()
+        )
+      )
+      .subscribe(dados => dados ? this.populaDadosForm(dados) : {});
     //this.verificaEmailService.verificarEmail('').subscribe();
 
     this.estados = this.dropDownService.getEstadosBr();
@@ -162,7 +172,7 @@ export class DataFormComponent implements OnInit {
     this.formulario.patchValue({
       endereco: {
         rua: dados.logradouro,
-        cep: dados.cep,
+        cep: dados.cep.replace("-", ""),
         complemento: dados.complemento,
         bairro: dados.bairro,
         cidade: dados.localidade,
