@@ -6,6 +6,7 @@ import { Observable, of } from 'rxjs';
 import { Cargo } from '../models/Cargo';
 import { Tecnologia } from '../models/Tecnologia';
 import { Newsletter } from '../models/Newsletter';
+import { Cidade } from '../models/cidade';
 
 
 @Injectable({
@@ -23,6 +24,13 @@ export class DropdownService {
           return res;
         })
       );
+  }
+
+  getCidades(idEstado: number) {
+    return this.http.get<Cidade[]>('/assets/dados/cidades.json')
+      .pipe(
+        map((cidades: Cidade[]) => cidades.filter(c => c.estado == idEstado))
+      )
   }
 
   getCargos(): Observable<Cargo[]> {

@@ -10,16 +10,18 @@ import { Tecnologia } from '../shared/models/Tecnologia';
 import { Newsletter } from '../shared/models/Newsletter';
 import { FormValidations } from '../shared/form-validation';
 import { VerificaEmailService } from './services/verifica-email.service';
+import { BaseFormComponent } from '../shared/base-form/base-form.component';
+import { Cidade } from '../shared/models/cidade';
 
 @Component({
   selector: 'app-data-form',
   templateUrl: './data-form.component.html',
   styleUrls: ['./data-form.component.css']
 })
-export class DataFormComponent implements OnInit {
-
-  formulario!: FormGroup;
-  estados!: Observable<EstadoBr[]>;
+export class DataFormComponent extends BaseFormComponent implements OnInit {
+  estados!: EstadoBr[];
+  cidades!: Cidade[];
+  //estados!: Observable<EstadoBr[]>;
   cargos!: Observable<Cargo[]>;
   tecnologias!: Observable<Tecnologia[]>;
   newsletterOp !: Observable<Newsletter[]>;
@@ -33,7 +35,7 @@ export class DataFormComponent implements OnInit {
     private dropDownService: DropdownService,
     private verificaEmailService: VerificaEmailService
   ) {
-
+    super();
   }
 
   ngOnInit() {
@@ -74,16 +76,24 @@ export class DataFormComponent implements OnInit {
           : empty()
         )
       )
-      .subscribe(dados => dados ? this.populaDadosForm(dados) : {});
+      .subscribe((dados: any) => dados ? this.populaDadosForm(dados) : {});
+
+    this.formulario.get('endereco.estado').valueChanges
+      .pipe(
+        map(estado => this.estados.filter(e => e.sigla === estado)),
+        map((estados: EstadoBr[]) => estados && estados.length > 0 ? estados[0].id : empty),
+        switchMap((estadoId: number) => this.dropDownService.getCidades(estadoId)),
+      )
+      .subscribe((cidades: Cidade[]) => this.cidades = cidades);
+    //this.dropDownService.getCidades(8).subscribe(console.log);
     //this.verificaEmailService.verificarEmail('').subscribe();
 
-    this.estados = this.dropDownService.getEstadosBr();
+    //this.estados = this.dropDownService.getEstadosBr();
+    this.dropDownService.getEstadosBr().subscribe(dados => this.estados = dados);;
     this.cargos = this.dropDownService.getCargos();
     this.tecnologias = this.dropDownService.getTecnologias();
     this.newsletterOp = this.dropDownService.getNewsletter();
   }
-
-
 
   buildFrameworks() {
     return this.formBuilder.array(
@@ -96,7 +106,7 @@ export class DataFormComponent implements OnInit {
     return (this.formulario.get('frameworks') as FormArray).controls
   }
 
-  onSubmit() {
+  submit() {
     console.log(this.formulario);
 
     let valueSubmit = Object.assign({}, this.formulario.value);
@@ -106,55 +116,14 @@ export class DataFormComponent implements OnInit {
         .filter((v: string) => v !== null)
     });
     console.log(valueSubmit.frameworks)
-    if (this.formulario.valid) {
-      this.http.post('https://httpbin.org/post', JSON.stringify(valueSubmit))
-        .pipe(res => res)
-        .subscribe(dados => {
-          console.log(dados);
-          this.resetar();
-        },
-          (error: any) => alert('Erro')
-        )
-    } else {
-      this.verificaValidacoesForm(this.formulario);
-    }
-  }
-
-  verificaValidacoesForm(formGroup: FormGroup) {
-    Object.keys(formGroup?.controls).forEach((campo) => {
-      const controle = formGroup?.get(campo);
-      controle?.markAsDirty();
-      if (controle instanceof FormGroup || controle instanceof FormArray) {
-        this.verificaValidacoesForm(controle as FormGroup);
-      }
-    })
-  }
-
-  resetar() {
-    this.formulario.reset();
-  }
-
-
-  IsValidTouched(attribute: string): boolean {
-    const control = this.formulario?.get(attribute);
-    if (!control) {
-      return false;
-    }
-    return control.hasError('required') && (control.touched || control.dirty);
-  }
-
-  verificaEmailInvalido() {
-    let campoEmail = this.formulario?.get('email');
-    if (campoEmail?.errors) {
-      return campoEmail.errors['email'] && campoEmail.touched;
-    }
-  }
-
-  applyErrorCss(attribute: string) {
-    return {
-      'has-error': this.IsValidTouched(attribute),
-      'has-feedback': this.IsValidTouched(attribute)
-    }
+    this.http.post('https://httpbin.org/post', JSON.stringify(valueSubmit))
+      .pipe(res => res)
+      .subscribe(dados => {
+        console.log(dados);
+        this.resetar();
+      },
+        (error: any) => alert('Erro')
+      )
   }
 
   consultaCEP() {
