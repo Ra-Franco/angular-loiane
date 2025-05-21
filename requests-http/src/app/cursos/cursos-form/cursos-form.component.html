@@ -1,0 +1,22 @@
+<form class="needs-validation" [formGroup]="form" style="padding-top: 10px;">
+    <div class="form-row">
+        <div class="col-sm-12">
+            <label for="nome">Nome do curso</label>
+            <input type="text" class="form-control" id="nome" placeholder="Nome do cursos" formControlName="nome"
+                [ngClass]="{'is-invalid': submitted && hasError('nome')}">
+            <div class="invalid-feedback" *ngIf="hasError('nome')?.['required']">
+                Por favor informe um nome para o curso
+            </div>
+            <div class="invalid-feedback" *ngIf="hasError('nome')?.['minlength']">
+                Nome precisa ter no minimo {{hasError('nome')?.['minlength'].requiredLength}} caracteres.
+            </div>
+            <div class="invalid-feedback" *ngIf="hasError('nome')?.['maxlength']">
+                Nome precisa ter no máximo {{hasError('nome')?.['maxlength'].requiredLength}} caracteres.
+            </div>
+        </div>
+    </div>
+    <div style="margin-top: 10px;">
+        <button class="btn btn-primary" type="submit" (click)="onSubmit()">Salvar</button>
+        <button class="btn" type="submit" (click)="onCancel()">Cancelar</button>
+    </div>
+</form>
